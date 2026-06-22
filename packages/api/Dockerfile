@@ -1,13 +1,17 @@
 # syntax=docker/dockerfile:1
 #
-# NestJS API — multi-stage build for the Karmen monorepo (npm workspaces).
+# NestJS API — multi-stage build for the Karmen monorepo (pnpm workspaces).
 #
 # Build context is the REPO ROOT (see docker-compose.yml `build.context: .`),
-# NOT packages/api. This is required so the workspace-aware `npm ci` can see the
-# root package.json + package-lock.json and resolve the workspace correctly.
+# NOT packages/api. This is required so the workspace-aware `pnpm install` can
+# see the root package.json + pnpm-lock.yaml + pnpm-workspace.yaml and resolve
+# the workspace correctly.
+#
+# pnpm is provisioned via corepack and pinned to the same version as the root
+# package.json `packageManager` field (pnpm@10.32.1).
 #
 # Stages:
-#   deps     -> install ALL deps (incl. dev) using the root lockfile
+#   deps     -> install ALL deps (incl. dev) from the root lockfile
 #   build    -> compile TypeScript -> dist/
 #   prod-deps-> install ONLY production deps (smaller node_modules)
 #   runtime  -> distro-slim image that ships dist/ + prod node_modules
@@ -41,18 +45,31 @@ ARG NODE_VERSION=20
 FROM node:${NODE_VERSION}-bookworm-slim AS deps
 WORKDIR /repo
 
+# Enable pnpm through corepack, pinned to the same version as the root
+# package.json `packageManager` field. Keep this in sync if you bump pnpm.
+RUN corepack enable && corepack prepare pnpm@10.32.1 --activate
+
+# Put the pnpm content-addressable store on a stable path so the BuildKit
+# cache mount below (target=/pnpm/store) lines up with where pnpm writes.
+ENV PNPM_HOME=/pnpm
+ENV PATH=$PNPM_HOME:$PATH
+RUN pnpm config set store-dir /pnpm/store
+
 # Copy only the manifests first so this layer is cached unless deps change.
-# Root manifests drive the npm workspace.
-COPY package.json package-lock.json ./
-# Per-workspace manifests. Add more COPY lines here if you add packages
-# that the API depends on at build time.
+# Root manifests + lockfile + workspace definition drive the pnpm workspace.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# Per-workspace manifests. Copy every package the lockfile references so pnpm
+# can resolve the full workspace graph from the frozen lockfile. Add more COPY
+# lines here if you add packages the API depends on at build time.
 COPY packages/api/package.json ./packages/api/package.json
 COPY packages/web/package.json ./packages/web/package.json
 
-# Install the whole workspace. BuildKit cache mount keeps npm's cache warm
-# across builds without baking it into a layer.
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci
+# Install the whole workspace strictly from the committed lockfile.
+# --frozen-lockfile fails (rather than mutating the lockfile) if it is out of
+# sync — the CI/prod-safe equivalent of `npm ci`. The BuildKit cache mount
+# keeps pnpm's store warm across builds without baking it into a layer.
+RUN --mount=type=cache,target=/pnpm/store \
+    pnpm install --frozen-lockfile
 
 # ---- Stage 2: build (compile TS) ------------------------------------------
 FROM deps AS build
@@ -62,16 +79,26 @@ COPY packages/api ./packages/api
 # Generate the Prisma client (no DB connection needed) so it is bundled into
 # node_modules before the TS build references it. No-op if the app has no
 # schema yet; the app MUST provide packages/api/prisma/schema.prisma.
-RUN npm run build --workspace=packages/api
+# --filter targets the workspace BY PATH (the subpackage names are future
+# contracts and not defined yet) — run its "build" script.
+RUN pnpm --filter ./packages/api run build
 
 # ---- Stage 3: prod-deps (production-only node_modules) --------------------
+# Fresh slim base (not built on `deps`) so dev deps never leak in. Re-provision
+# pnpm via corepack, then install production-only deps for just the API.
 FROM node:${NODE_VERSION}-bookworm-slim AS prod-deps
 WORKDIR /repo
-COPY package.json package-lock.json ./
+RUN corepack enable && corepack prepare pnpm@10.32.1 --activate
+ENV PNPM_HOME=/pnpm
+ENV PATH=$PNPM_HOME:$PATH
+RUN pnpm config set store-dir /pnpm/store
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/api/package.json ./packages/api/package.json
 COPY packages/web/package.json ./packages/web/package.json
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev --workspace=packages/api --include-workspace-root
+# --prod skips devDependencies; --filter scopes the install to the API
+# workspace BY PATH (subpackage names are future contracts, not defined yet).
+RUN --mount=type=cache,target=/pnpm/store \
+    pnpm install --frozen-lockfile --prod --filter ./packages/api
 
 # ---- Stage 4: runtime -----------------------------------------------------
 FROM node:${NODE_VERSION}-bookworm-slim AS runtime
@@ -114,7 +141,9 @@ WORKDIR /repo
 COPY packages/api ./packages/api
 WORKDIR /repo/packages/api
 # Prisma reads DATABASE_URL from the environment (injected by compose).
-CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed"]
+# `pnpm exec` runs the workspace-local Prisma CLI binary (resolved from the
+# deps tree) — the pnpm equivalent of `npx`.
+CMD ["sh", "-c", "pnpm exec prisma migrate deploy && pnpm exec prisma db seed"]
 
 # ---- Stage 6: dev (hot reload) --------------------------------------------
 # Targeted by docker-compose.override.yml for local development.
@@ -125,4 +154,5 @@ WORKDIR /repo/packages/api
 ENV PORT=3000
 EXPOSE 3000
 # `start:dev` is the NestJS watch-mode script. The app must define it.
-CMD ["npm", "run", "start:dev", "--workspace=packages/api"]
+# --filter targets the API workspace BY PATH (names are future contracts).
+CMD ["pnpm", "--filter", "./packages/api", "run", "start:dev"]

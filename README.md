@@ -89,7 +89,7 @@ Discrete Postgres variables are the **source of truth**; `DATABASE_URL` is deriv
 
 ### Notes
 
-- Both images build from repo root (needed for npm workspaces).
+- Both images build from repo root (needed for pnpm workspaces).
 - API runtime image runs as unprivileged `node` user.
 - Secrets from `.env` only, never in layers.
 - Single-arch, local-only.

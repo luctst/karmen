@@ -1,8 +1,11 @@
 # Build context = repo root (both Dockerfiles build from here).
 # Keep the context small & fast, and never ship secrets or build junk.
 
-# Dependencies (reinstalled inside the image via `npm ci`)
+# Dependencies (reinstalled inside the image via `pnpm install --frozen-lockfile`)
 **/node_modules
+# Local pnpm content-addressable store (the in-image build uses a BuildKit
+# cache mount instead; never ship the host store into the context).
+**/.pnpm-store
 
 # Build outputs (regenerated in-image)
 **/dist

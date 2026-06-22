@@ -1,6 +1,6 @@
 # @karmen/api
 
-The Karmen backend API — NestJS (TypeScript) with Prisma ORM, part of the npm-workspaces monorepo.
+The Karmen backend API — NestJS (TypeScript) with Prisma ORM, part of the pnpm-workspaces monorepo.
 
 > **Source of truth for this package.** This README documents the contract that the Docker setup expects and the runtime environment the API runs in. See the **Onboarding** section in the root `README.md` for topology and bootstrap flow.
 
@@ -53,4 +53,4 @@ docker compose down -v && docker compose up --build
 
 ## Build context
 
-The Docker build uses the **repo root** as its context (not this directory), so the workspace `package.json` + `package-lock.json` can be resolved during `npm ci`. See the `Dockerfile` header and the **Build context** subsection in the root `README.md`'s Onboarding section for details.
+The Docker build uses the **repo root** as its context (not this directory), so the workspace `package.json` + `pnpm-lock.yaml` + `pnpm-workspace.yaml` can be resolved during `pnpm install --frozen-lockfile`. See the `Dockerfile` header and the **Build context** subsection in the root `README.md`'s Onboarding section for details.

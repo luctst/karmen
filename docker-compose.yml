@@ -50,7 +50,7 @@ services:
 
   migrate:
     build:
-      context: .                       # repo root — needed for workspace npm ci
+      context: .                       # repo root — needed for pnpm workspace install
       dockerfile: packages/api/Dockerfile
       target: migrate
     environment:

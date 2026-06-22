@@ -1,6 +1,6 @@
 # @karmen/web
 
-The Karmen frontend — React + TypeScript, built with **Vite**, part of the npm-workspaces monorepo.
+The Karmen frontend — React + TypeScript, built with **Vite**, part of the pnpm-workspaces monorepo.
 
 > **Source of truth for this package.** This README documents the contract that the Docker setup expects and the build/runtime environment. See the **Onboarding** section in the root `README.md` for topology and bootstrap flow.
 
@@ -53,4 +53,4 @@ The web app and API run on **separate origins**. All API fetch requests must:
 
 ## Build context
 
-The Docker build uses the **repo root** as its context (not this directory), so the workspace `package.json` + `package-lock.json` can be resolved during `npm ci`. See the `Dockerfile` header and the **Build context** subsection in the root `README.md`'s Onboarding section for details.
+The Docker build uses the **repo root** as its context (not this directory), so the workspace `package.json` + `pnpm-lock.yaml` + `pnpm-workspace.yaml` can be resolved during `pnpm install --frozen-lockfile`. See the `Dockerfile` header and the **Build context** subsection in the root `README.md`'s Onboarding section for details.

@@ -6,12 +6,11 @@
   "author": "Lucas Tostée",
   "license": "MIT",
   "type": "commonjs",
+  "packageManager": "pnpm@10.32.1",
   "engines": {
-    "node": ">=20"
+    "node": ">=20",
+    "pnpm": ">=10"
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "prepare": "husky",
     "commitlint": "commitlint --edit"

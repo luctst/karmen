@@ -1,0 +1,4 @@
+# pnpm workspace definition (replaces the root package.json `workspaces` field
+# that npm used). pnpm discovers every package via these globs.
+packages:
+  - 'packages/*'
