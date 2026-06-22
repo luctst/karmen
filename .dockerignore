@@ -1,0 +1,52 @@
+# Build context = repo root (both Dockerfiles build from here).
+# Keep the context small & fast, and never ship secrets or build junk.
+
+# Dependencies (reinstalled inside the image via `npm ci`)
+**/node_modules
+
+# Build outputs (regenerated in-image)
+**/dist
+**/build
+**/dist-ssr
+**/.next
+**/out
+**/coverage
+**/.nyc_output
+**/*.tsbuildinfo
+
+# Env & secrets — NEVER bake into image layers
+.env
+.env.*
+*.env
+!.env.example
+
+# VCS / CI / editor
+.git
+.gitignore
+.github
+.husky
+.vscode
+.idea
+
+# Docker meta (not needed inside the build)
+docker-compose*.yml
+docker-compose*.yaml
+**/Dockerfile
+.dockerignore
+.docker/
+docker-data/
+
+# Logs & caches
+**/*.log
+**/.cache
+**/.eslintcache
+**/.turbo
+**/.vite
+
+# Docs (not needed in runtime image)
+*.md
+docs/
+
+# OS cruft
+**/.DS_Store
+**/Thumbs.db

@@ -1,0 +1,32 @@
+# Local development override (hot reload). Copy to docker-compose.override.yml to activate.
+# See the "Development stack" section in the root README.md for how this works and what it changes.
+
+services:
+  api:
+    build:
+      target: dev
+    environment:
+      NODE_ENV: development
+      # Web dev server origin for CORS.
+      CORS_ORIGIN: http://localhost:${WEB_DEV_PORT:-5173}
+    command: ["npm", "run", "start:dev", "--workspace=packages/api"]
+    volumes:
+      - ./packages/api:/repo/packages/api
+      - /repo/node_modules            # anonymous volume: keep in-image deps
+    # api host port stays as defined in the base file (API_PORT -> 3000)
+
+  web:
+    build:
+      target: dev
+      args:
+        # In dev the SPA calls the API at its published host origin.
+        VITE_API_BASE_URL: http://localhost:${API_PORT:-3000}
+    environment:
+      NODE_ENV: development
+    command: ["npm", "run", "dev", "--workspace=packages/web", "--", "--host", "0.0.0.0"]
+    volumes:
+      - ./packages/web:/repo/packages/web
+      - /repo/node_modules
+    ports:
+      # Vite dev server (HMR) replaces the base file's preview mapping.
+      - "${WEB_DEV_PORT:-5173}:5173"
