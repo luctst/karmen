@@ -21,15 +21,17 @@ A case study demonstrating product thinking and engineering execution: understan
 │   ├── api/                               # NestJS backend
 │   │   ├── Dockerfile
 │   │   └── README.md
-│   └── web/                               # React frontend
-│       ├── Dockerfile
+│   ├── web/                               # React frontend
+│   │   ├── Dockerfile
+│   │   └── README.md
+│   └── ui/                                # @karmen/ui — shared shadcn/ui component library
 │       └── README.md
 └── docs/                                  # Case study write-up, notes, decisions
 ```
 
 ## Onboarding
 
-Four containerized services (Docker 25, Compose v2): **web** (React/Vite), **api** (NestJS), **db** (Postgres 16), **migrate** (one-shot Prisma runner). Local-only, separate origins, CORS enabled. For full package contracts, see `packages/api/README.md` and `packages/web/README.md`.
+Four containerized services (Docker 25, Compose v2): **web** (React/Vite), **api** (NestJS), **db** (Postgres 16), **migrate** (one-shot Prisma runner). Local-only, separate origins, CORS enabled. For full package contracts, see `packages/api/README.md` and `packages/web/README.md`. Shared UI components live in `packages/ui` (`@karmen/ui`) — see `packages/ui/README.md`.
 
 ### First-time setup
 
