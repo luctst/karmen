@@ -4,7 +4,7 @@
   "private": true,
   "description": "Product Engineer case study for Karmen",
   "author": "Lucas Tostée",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "type": "commonjs",
   "engines": {
     "node": ">=20"
