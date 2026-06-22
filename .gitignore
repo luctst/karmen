@@ -1,27 +1,96 @@
-# Dependencies
+# ─── Dependencies ───────────────────────────────────────────
 node_modules/
 .pnp
 .pnp.js
+.pnp.cjs
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+jspm_packages/
 
-# Environment
-.env
-.env.local
-.env.*.local
-
-# Build output
-dist/
-build/
-.next/
-out/
-
-# Logs
-*.log
+# ─── Package manager logs ───────────────────────────────────
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+lerna-debug.log*
 
-# OS / Editor
+# ─── Environment ────────────────────────────────────────────
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+*.env
+
+# ─── TypeScript ─────────────────────────────────────────────
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# ─── NestJS / backend build ─────────────────────────────────
+dist/
+build/
+coverage/
+.nyc_output/
+
+# ─── React / frontend build ─────────────────────────────────
+# Vite
+dist-ssr/
+*.local
+
+# Create React App
+/build
+
+# Next.js (in case)
+.next/
+out/
+
+# ─── Testing ────────────────────────────────────────────────
+coverage/
+.jest/
+junit.xml
+
+# ─── Caches ─────────────────────────────────────────────────
+.cache/
+.eslintcache
+.stylelintcache
+.parcel-cache/
+.turbo/
+.vite/
+
+# ─── Docker ─────────────────────────────────────────────────
+# Local override compose files (keep committed base compose)
+docker-compose.override.yml
+docker-compose.override.yaml
+# Named volume / data mounts kept locally
+.docker/
+docker-data/
+*.pid
+
+# ─── Logs ───────────────────────────────────────────────────
+logs/
+*.log
+
+# ─── OS ─────────────────────────────────────────────────────
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ─── Editors / IDE ──────────────────────────────────────────
 .idea/
-.vscode/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
 *.swp
+*.swo
+*~
+*.sublime-workspace
