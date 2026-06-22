@@ -1,30 +1,11 @@
-# Karmen — local case-study compose stack.
+# Karmen — local case-study compose stack (LOCAL-ONLY: no proxy/registry, single-arch).
 #
-# Services:
-#   db      -> Postgres 16 (named volume, healthcheck)
-#   migrate -> one-shot: `prisma migrate deploy && prisma db seed` (runs once,
-#              after db is healthy, then exits)
-#   api     -> NestJS (Prisma), published on the host
-#   web     -> React/Vite build served by `vite preview`, published on the host
+#   web (vite preview) + api (nest) are published on the host; db is internal-only.
+#   The SPA calls the api as a separate origin via VITE_API_BASE_URL (api needs CORS).
+#   migrate runs once (migrate deploy + seed) after db is healthy, then exits.
 #
-# LOCAL-ONLY: no nginx, no reverse proxy, no registry, single-arch. web and api
-# are SEPARATE origins; the SPA calls the API via VITE_API_BASE_URL (its
-# published host port). The API must enable CORS for the web origin.
-#
-# For local hot-reload dev, copy docker-compose.override.yml.example ->
-# docker-compose.override.yml; compose auto-merges it (the override is gitignored).
-#
-# No top-level `version:` key (ignored by Compose v2).
-#
-# Run:   docker compose up --build       (config via .env — see .env.example)
-#
-# Topology (host ports shown):
-#
-#   browser --> localhost:${WEB_PORT}  ->  web  (vite preview :4173)
-#   browser --> localhost:${API_PORT}  ->  api  (nest :3000)  --> db (:5432)
-#                                                                   ^
-#                                              migrate (one-shot) --+
-#   All services share karmen-net (DNS by service name).
+# Run:  docker compose up --build       (config via .env — see .env.example)
+# Dev:  cp docker-compose.override.yml.example docker-compose.override.yml  (auto-merged, gitignored)
 
 services:
   db:
@@ -37,8 +18,9 @@ services:
       POSTGRES_DB: ${PGDATABASE:-karmen}
     volumes:
       - pgdata:/var/lib/postgresql/data
-    ports:
-      - "${DB_PORT:-5432}:5432"
+    # No `ports:` — the DB is reachable only inside karmen-net (api/migrate use
+    # the `db:5432` hostname). To inspect it from the host, publish a port in
+    # docker-compose.override.yml (e.g. "127.0.0.1:5432:5432").
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${PGUSER:-karmen} -d ${PGDATABASE:-karmen}"]
       interval: 10s

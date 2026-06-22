@@ -85,7 +85,7 @@ Discrete Postgres variables are the **source of truth**; `DATABASE_URL` is deriv
 | `WEB_PORT`          | `.env`          | host→web       | `8080`           |
 | `WEB_DEV_PORT`      | `.env`          | host→web (dev) | `5173`           |
 | `API_PORT`          | `.env`          | host→api       | `3000`           |
-| `DB_PORT`           | `.env`          | host→db        | `5432`           |
+| `DB_PORT`           | `.env`          | host→db (opt-in, override only) | `5432`           |
 
 ### Notes
 
