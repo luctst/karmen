@@ -50,6 +50,9 @@ RUN pnpm config set store-dir /pnpm/store
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/web/package.json ./packages/web/package.json
 COPY packages/api/package.json ./packages/api/package.json
+# web depends on @karmen/ui (workspace:*) — its manifest must be present so the
+# frozen install can resolve the full workspace graph from the lockfile.
+COPY packages/ui/package.json ./packages/ui/package.json
 
 # Install strictly from the committed lockfile (CI/prod-safe, like `npm ci`).
 # BuildKit cache mount keeps pnpm's store warm without baking it into a layer.
@@ -63,6 +66,10 @@ WORKDIR /repo
 ARG VITE_API_BASE_URL
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 COPY packages/web ./packages/web
+# @karmen/ui is consumed as SOURCE (its exports map points at ./src/*.tsx and
+# globals.css does `@source "../../../ui/src/**"`), so the ui source must be
+# present for vite to import it and for the Tailwind @source scan to find it.
+COPY packages/ui ./packages/ui
 # --filter targets the web workspace BY PATH (subpackage names are future
 # contracts and not defined yet) — run its "build" script.
 RUN pnpm --filter ./packages/web run build
@@ -81,8 +88,10 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://127.0.0.1:4173/',r=>process.exit(r.statusCode<500?0:1)).on('error',()=>process.exit(1))"
 # --host exposes preview outside the container; --port pins it. Args after the
 # script name pass straight to `vite preview` (no `--` separator needed with
-# pnpm run). --filter targets the web workspace BY PATH.
-CMD ["pnpm", "--filter", "./packages/web", "run", "preview", "--host", "0.0.0.0", "--port", "4173"]
+# pnpm run). --filter targets the workspace BY NAME: a path filter (./packages/web)
+# is resolved relative to the WORKDIR above (/repo/packages/web), so it would look
+# for a non-existent nested path and match no projects. The name is now defined.
+CMD ["pnpm", "--filter", "@karmen/web", "run", "preview", "--host", "0.0.0.0", "--port", "4173"]
 
 # ---- Stage 4: dev (Vite dev server with HMR) ------------------------------
 # Targeted by docker-compose.override.yml. Source bind-mounted at runtime.
@@ -91,5 +100,7 @@ ENV NODE_ENV=development
 WORKDIR /repo/packages/web
 EXPOSE 5173
 # --host exposes the dev server outside the container. Args after the script
-# name pass straight to `vite`. --filter targets the web workspace BY PATH.
-CMD ["pnpm", "--filter", "./packages/web", "run", "dev", "--host", "0.0.0.0"]
+# name pass straight to `vite`. --filter targets the workspace BY NAME (a path
+# filter would resolve relative to the WORKDIR and match no projects — see the
+# runtime stage note). The name is now defined.
+CMD ["pnpm", "--filter", "@karmen/web", "run", "dev", "--host", "0.0.0.0"]
