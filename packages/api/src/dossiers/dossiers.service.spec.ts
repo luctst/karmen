@@ -151,7 +151,6 @@ describe('DossiersService', () => {
         riskBucket: 'high',
         globalScore: 34,
       });
-      // companyId is intentionally not surfaced on the financingRequest node.
       expect(result.financingRequest).not.toHaveProperty('companyId');
     });
   });

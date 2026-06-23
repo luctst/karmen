@@ -3,7 +3,6 @@ import { describe, it, expect } from "vitest"
 import { scoreDisplay } from "./score"
 import { makeScore } from "../../test/fixtures"
 
-// Band edges are off-by-one prone, so each is pinned exactly plus the value below.
 describe("scoreDisplay — A–E band boundaries", () => {
   const cases: Array<[number, string]> = [
     [100, "A"],

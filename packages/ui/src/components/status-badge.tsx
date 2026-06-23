@@ -18,9 +18,6 @@ import {
 
 import { cn } from "@karmen/ui/lib/utils"
 
-// The only component that paints a status color — nothing else hand-rolls a chip.
-// color-is-never-alone (§5): always icon + text + color; aria-label carries the
-// full verdict (status + optional context).
 type StatusFamily = "clean" | "warn" | "block" | "neutral" | "info"
 
 type StatusKey =
@@ -100,9 +97,7 @@ const badgeVariants = cva(
 type StatusBadgeProps = Omit<React.ComponentProps<"span">, "children"> &
   VariantProps<typeof badgeVariants> & {
     status: StatusKey
-    // Optional override for the visible label.
     label?: string
-    // Appended to the aria-label for screen-reader context.
     context?: string
   }
 

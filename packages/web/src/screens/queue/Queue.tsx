@@ -9,7 +9,6 @@ import { QueueSkeleton } from "../../components/queue/QueueSkeleton"
 import { groupQueue } from "../../components/queue/grouping"
 import type { QueueTier } from "../../components/queue/grouping"
 
-// Neutral priority ticks: opacity (never status color) encodes actionability.
 const TIER_TICK: Record<QueueTier, string> = {
   fast_close: "bg-foreground",
   exceptions: "bg-foreground/70",

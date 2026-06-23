@@ -3,8 +3,6 @@ import { render, screen } from "@testing-library/react"
 
 import { StatusBadge } from "@karmen/ui/components/status-badge"
 
-// color-is-never-alone: every badge carries visible text + an aria-label, so the
-// verdict survives without color (§5/§7).
 describe("StatusBadge", () => {
   it("renders the default label text for the clean family", () => {
     render(<StatusBadge status="clean" />)
@@ -29,7 +27,6 @@ describe("StatusBadge", () => {
         context="risque élevé"
       />
     )
-    // aria-label uses the §7 canonical label, not the visible override.
     const badge = screen.getByLabelText("Anomalie bloquante : risque élevé")
     expect(badge).toBeInTheDocument()
     expect(badge).toHaveAttribute("data-status", "anomaly_blocking")
@@ -45,7 +42,6 @@ describe("StatusBadge", () => {
     const svg = container.querySelector("svg")
     expect(svg).not.toBeNull()
     expect(svg).toHaveAttribute("aria-hidden", "true")
-    // Text is still present — color/icon are reinforcement, not the carrier.
     expect(screen.getByText("En attente")).toBeInTheDocument()
   })
 })

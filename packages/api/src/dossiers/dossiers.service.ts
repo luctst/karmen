@@ -7,7 +7,6 @@ import type {
   DossierQueueItem,
 } from './dossiers.types';
 
-// Derived from the includes below so the mappers break loudly if the schema moves.
 type QueueRecord = Prisma.FinancingRequestGetPayload<{
   include: {
     company: { select: { id: true; name: true; siren: true; businessType: true } };
@@ -50,7 +49,6 @@ export class DossiersService {
     return this.toAggregate(record);
   }
 
-  /** Pure mapper — unit-testable without a database. */
   toQueueItem(record: QueueRecord): DossierQueueItem {
     return {
       id: record.id,
@@ -74,7 +72,6 @@ export class DossiersService {
     };
   }
 
-  /** Pure mapper — unit-testable without a database. */
   toAggregate(record: AggregateRecord): DossierAggregate {
     return {
       company: {

@@ -28,7 +28,6 @@ describe("QueueRow", () => {
   it('renders "NN / X" for a scored dossier', () => {
     renderRow(makeDossier({ score: makeScore(82, "low") }))
     expect(screen.getByText(/82 \/ A/)).toBeInTheDocument()
-    // Screen readers get a full sentence, not "82 slash A".
     expect(
       screen.getByText("Score 82 sur 100, catégorie A, Risque faible")
     ).toBeInTheDocument()

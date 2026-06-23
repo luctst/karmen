@@ -14,10 +14,6 @@ export class PrismaService
   private readonly logger = new Logger(PrismaService.name);
 
   async onModuleInit(): Promise<void> {
-    // Eagerly open the pool, but do not let an unreachable DB block HTTP
-    // startup — the health endpoint must stay answerable so the container
-    // healthcheck and orchestrator can observe the process is alive. Prisma
-    // reconnects lazily on the next query if this initial attempt fails.
     try {
       await this.$connect();
     } catch (error) {

@@ -1,5 +1,3 @@
-// Preserves the list layout while loading (no spinner-on-blank).
-// Mirrors QueueRow column widths so loading→loaded doesn't shift.
 const ROW_COUNT = 7
 
 export function QueueSkeleton() {

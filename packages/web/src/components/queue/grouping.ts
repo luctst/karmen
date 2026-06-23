@@ -2,9 +2,6 @@ import type { StatusKey } from "@karmen/ui/components/status-badge"
 
 import type { DossierSummary } from "../../api/types"
 
-// The priority ladder is derived from status + riskBucket because the
-// completeness/anomaly-count data the design imagines doesn't exist in the API
-// yet. Ordered by actionability, not chronology.
 export type QueueTier =
   | "fast_close"
   | "exceptions"
@@ -19,7 +16,6 @@ export type QueueGroup = {
   dossiers: DossierSummary[]
 }
 
-// Display order = priority order; earlier = more actionable.
 const TIER_ORDER: QueueTier[] = [
   "fast_close",
   "exceptions",
@@ -58,7 +54,6 @@ export function tierFor(dossier: DossierSummary): QueueTier {
   }
 }
 
-// Empty tiers are omitted.
 export function groupQueue(dossiers: DossierSummary[]): QueueGroup[] {
   const buckets = new Map<QueueTier, DossierSummary[]>()
 
@@ -79,8 +74,6 @@ export function groupQueue(dossiers: DossierSummary[]): QueueGroup[] {
   })
 }
 
-// rejected uses the neutral `decided` key, not amber: a closed decision is not
-// something that needs attention (§5 signal economy).
 export function badgeFor(dossier: DossierSummary): {
   status: StatusKey
   label: string

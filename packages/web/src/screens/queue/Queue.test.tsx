@@ -7,8 +7,6 @@ import { Queue } from "./Queue"
 import { makeDossier, makeScore } from "../../test/fixtures"
 import type { DossierSummary } from "../../api/types"
 
-// Mock the hook, not fetch: the test is about the loading/empty/error/success
-// switch given an async state, not about transport.
 const useQueueMock = vi.fn()
 vi.mock("../../api/hooks", () => ({
   useQueue: () => useQueueMock(),
@@ -90,14 +88,12 @@ describe("Queue — success state", () => {
     })
     renderQueue()
 
-    // Count now renders as a pill (the digit), not inline "(n)".
     const fastClose = screen.getByRole("heading", { name: /Clôtures rapides/ })
     expect(fastClose).toHaveTextContent("2")
 
     const blocked = screen.getByRole("heading", { name: /Bloqués/ })
     expect(blocked).toHaveTextContent("1")
 
-    // Three rows total across the two groups.
     expect(screen.getAllByRole("listitem")).toHaveLength(3)
   })
 
@@ -121,8 +117,6 @@ describe("Queue — success state", () => {
       data: [makeDossier({ status: "blocked" }), makeDossier({ status: "approved" })],
     })
     renderQueue()
-    // The count number and its descriptor are now separate nodes (the number
-    // is emphasized in its own span), so assert each piece.
     expect(screen.getByText("2")).toBeInTheDocument()
     expect(
       screen.getByText(/dossiers · triés par priorité d'action/)

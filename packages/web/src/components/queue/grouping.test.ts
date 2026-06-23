@@ -57,14 +57,13 @@ describe("tierFor — 6-tier assignment", () => {
 
 describe("groupQueue", () => {
   it("orders groups by actionability, not input order", () => {
-    // Provide in deliberately scrambled order; expect the priority ladder out.
     const dossiers = [
-      makeDossier({ status: "approved" }), // decided
-      makeDossier({ status: "blocked" }), // blocked
-      makeDossier({ status: "pending_review", score: makeScore(82, "low") }), // fast_close
-      makeDossier({ status: "awaiting_client" }), // awaiting_client
-      makeDossier({ status: "info_requested" }), // re_eval
-      makeDossier({ status: "pending_review", score: makeScore(20, "high") }), // exceptions
+      makeDossier({ status: "approved" }),
+      makeDossier({ status: "blocked" }),
+      makeDossier({ status: "pending_review", score: makeScore(82, "low") }),
+      makeDossier({ status: "awaiting_client" }),
+      makeDossier({ status: "info_requested" }),
+      makeDossier({ status: "pending_review", score: makeScore(20, "high") }),
     ]
 
     const tiers = groupQueue(dossiers).map((g) => g.tier)
@@ -184,8 +183,6 @@ describe("badgeFor — status + risk → badge key", () => {
     expect(badge.label).toBe("Validé")
   })
 
-  // A rejected dossier is a closed decision, not something needing attention —
-  // it wears the calm neutral `decided` key, not amber (§5 signal economy).
   it("rejected → decided / Refusé", () => {
     const badge = badgeFor(makeDossier({ status: "rejected" }))
     expect(badge.status).toBe("decided")

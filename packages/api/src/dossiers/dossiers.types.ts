@@ -5,7 +5,6 @@ import type {
   RiskBucket,
 } from '@prisma/client';
 
-/** A queue row: a FinancingRequest joined to its company + score. */
 export interface DossierQueueItem {
   id: string;
   company: {
@@ -62,7 +61,6 @@ export interface DossierScore {
   globalScore: number;
 }
 
-/** The full aggregate returned by GET /dossiers/:id. */
 export interface DossierAggregate {
   company: DossierCompany;
   financingRequest: DossierFinancingRequest;

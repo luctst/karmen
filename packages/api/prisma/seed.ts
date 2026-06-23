@@ -1,6 +1,3 @@
-// Idempotent: keyed by id via upsert, so re-running (the Docker migrate service
-// runs it on every up) is safe. Covers queue variety: high/low/medium risk + an
-// incomplete dossier with no score.
 import {
   DocumentType,
   FinancingType,
@@ -47,7 +44,6 @@ interface SeedDossier {
 }
 
 const dossiers: SeedDossier[] = [
-  // high risk, full docs (the provided fr-003 example, verbatim)
   {
     company: {
       id: 'c-003',
@@ -109,7 +105,6 @@ const dossiers: SeedDossier[] = [
     score: { id: 's-003', riskBucket: RiskBucket.high, globalScore: 34 },
   },
 
-  // clean, low risk, full docs
   {
     company: {
       id: 'c-001',
@@ -155,7 +150,6 @@ const dossiers: SeedDossier[] = [
     score: { id: 's-001', riskBucket: RiskBucket.low, globalScore: 82 },
   },
 
-  // incomplete, awaiting client, no score, no docs
   {
     company: {
       id: 'c-002',
@@ -184,7 +178,6 @@ const dossiers: SeedDossier[] = [
     score: null,
   },
 
-  // medium risk, partial docs
   {
     company: {
       id: 'c-004',

@@ -1,6 +1,3 @@
-// Karmen API — Prisma schema.
-// Datasource reads DATABASE_URL (assembled from PG* vars by docker-compose).
-
 generator client {
   provider = "prisma-client-js"
 }
