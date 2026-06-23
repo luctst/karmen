@@ -2,11 +2,9 @@
 
 This repository holds a case study for the **Product Engineer** position at [Karmen](https://www.getkarmen.com/).
 
-## Summary
+## Product framing
 
-Financing applications today take ~2 hours to analyze. The bottleneck is not analyst skill but **dysfunctional product architecture**: the analyst must manually verify document completeness *and* manually integrate data across disconnected modules. This case study builds a **unified dossier workspace** with explainable scoring to move toward "review-by-exception"—clean dossiers validated in seconds, analyst time focused on complex cases.
-
-The thesis: **automate the deterministic, preserve judgment.** Target: ~30min average throughput. For the full product framing, motivation, and roadmap, see [CADRAGE.md](./CADRAGE.md) — this document explains why each step matters and how the prototype phases toward that goal.
+The problem, the thesis, and the phased roadmap live in [CADRAGE.md](./CADRAGE.md) — the product framing document. Read it first for the reasoning behind this prototype.
 
 ## What we build
 
@@ -80,13 +78,6 @@ Discrete Postgres variables are the **source of truth**; `DATABASE_URL` is deriv
 | `API_PORT`          | `.env`          | host→api       | `3000`           |
 | `DB_PORT`           | `.env`          | host→db (opt-in, override only) | `5432`           |
 
-### Notes
-
-- Both images build from repo root (needed for pnpm workspaces).
-- API runtime image runs as unprivileged `node` user.
-- Secrets from `.env` only, never in layers.
-- Single-arch, local-only.
-
 ## Structure
 
 ```
@@ -113,7 +104,3 @@ Discrete Postgres variables are the **source of truth**; `DATABASE_URL` is deriv
 ## Status
 
 🚧 Work in progress.
-
----
-
-_Author: [Lucas Tostée](https://github.com/luctst)_
