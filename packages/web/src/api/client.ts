@@ -30,3 +30,30 @@ export async function apiGet<T>(
 
   return (await response.json()) as T
 }
+
+export async function apiPost<T>(
+  path: string,
+  body: unknown,
+  init?: RequestInit
+): Promise<T> {
+  const url = `${API_BASE_URL}${path}`
+  const response = await fetch(url, {
+    method: "POST",
+    ...init,
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      ...init?.headers,
+    },
+    body: JSON.stringify(body),
+  })
+
+  if (!response.ok) {
+    throw new ApiError(
+      response.status,
+      `Requête échouée (${response.status}) sur ${path}.`
+    )
+  }
+
+  return (await response.json()) as T
+}

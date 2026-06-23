@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useState } from "react"
 
-import { apiGet } from "./client"
-import type { DossierAggregate, DossierSummary } from "./types"
+import { apiGet, apiPost } from "./client"
+import type {
+  DecisionPayload,
+  DossierAggregate,
+  DossierSummary,
+} from "./types"
 
 type AsyncState<T> = {
   data: T | null
@@ -90,4 +94,37 @@ export function useDossier(id: string | undefined) {
   }, [id, reloadToken])
 
   return { ...state, refetch }
+}
+
+export function useDecision(id: string | undefined) {
+  const [isPending, setIsPending] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+
+  const decide = useCallback(
+    async (payload: DecisionPayload) => {
+      if (!id) throw new Error("Identifiant de dossier manquant.")
+
+      setIsPending(true)
+      setError(null)
+
+      try {
+        return await apiPost<DossierAggregate>(
+          `/dossiers/${id}/decision`,
+          payload
+        )
+      } catch (err: unknown) {
+        const normalized =
+          err instanceof Error
+            ? err
+            : new Error("Erreur inconnue lors de la décision.")
+        setError(normalized)
+        throw normalized
+      } finally {
+        setIsPending(false)
+      }
+    },
+    [id]
+  )
+
+  return { decide, isPending, error }
 }

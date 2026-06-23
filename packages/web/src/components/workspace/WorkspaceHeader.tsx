@@ -1,19 +1,40 @@
-import { Link } from "react-router-dom"
-import { ArrowLeft } from "lucide-react"
+import { useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { ArrowLeft, Loader2 } from "lucide-react"
 
+import { Button } from "@karmen/ui/components/button"
 import { StatusBadge } from "@karmen/ui/components/status-badge"
 
-import type { DossierAggregate } from "../../api/types"
+import { useDecision } from "../../api/hooks"
+import type { DecisionKind, DossierAggregate } from "../../api/types"
 import { scoreDisplay } from "../queue/score"
 import { verdictBadge } from "./dossierBadge"
 
 type WorkspaceHeaderProps = {
+  dossierId: string | undefined
   dossier: DossierAggregate
 }
 
-export function WorkspaceHeader({ dossier }: WorkspaceHeaderProps) {
+export function WorkspaceHeader({ dossierId, dossier }: WorkspaceHeaderProps) {
+  const navigate = useNavigate()
+  const { decide, isPending, error } = useDecision(dossierId)
+  const [active, setActive] = useState<DecisionKind | null>(null)
+
   const badge = verdictBadge(dossier)
   const score = scoreDisplay(dossier.score)
+
+  const status = dossier.financingRequest.status
+  const isDecided = status === "approved" || status === "rejected"
+
+  async function onDecide(decision: DecisionKind) {
+    setActive(decision)
+    try {
+      await decide({ decision })
+      navigate("/")
+    } catch {
+      setActive(null)
+    }
+  }
 
   return (
     <header
@@ -70,6 +91,58 @@ export function WorkspaceHeader({ dossier }: WorkspaceHeaderProps) {
             </span>
           )}
         </span>
+
+        <span aria-hidden="true" className="h-4 w-px shrink-0 bg-border" />
+
+        {isDecided ? (
+          <StatusBadge
+            status={status === "approved" ? "clean" : "decided"}
+            label={status === "approved" ? "Validé" : "Refusé"}
+          />
+        ) : (
+          <div className="flex items-center gap-2">
+            {error ? (
+              <span
+                role="alert"
+                className="text-xs text-status-block-foreground"
+              >
+                Échec — aucune décision enregistrée.
+              </span>
+            ) : null}
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isPending}
+              onClick={() => onDecide("request_info")}
+            >
+              {active === "request_info" && isPending ? (
+                <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+              ) : null}
+              Demander des informations
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isPending}
+              onClick={() => onDecide("reject")}
+            >
+              {active === "reject" && isPending ? (
+                <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+              ) : null}
+              Refuser
+            </Button>
+            <Button
+              size="sm"
+              disabled={isPending}
+              onClick={() => onDecide("approve")}
+            >
+              {active === "approve" && isPending ? (
+                <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+              ) : null}
+              Valider
+            </Button>
+          </div>
+        )}
       </div>
     </header>
   )

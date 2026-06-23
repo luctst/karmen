@@ -1,12 +1,20 @@
 import type {
   Company,
+  ConnectionSource,
   DossierAggregate,
+  DossierAnalyse,
+  DossierCompleteness,
   DossierDocument,
   DossierFinancingRequest,
   DossierScore,
+  DossierScoreDetail,
   DossierStatus,
   DossierSummary,
+  HiddenAccount,
+  Indicator,
   RiskBucket,
+  ScoreCheckItem,
+  ScoreFactor,
 } from "../api/types"
 
 let seq = 0
@@ -89,6 +97,106 @@ export function makeDocument(
   }
 }
 
+export function makeScoreFactor(
+  overrides: Partial<ScoreFactor> = {}
+): ScoreFactor {
+  seq += 1
+  return {
+    id: `f-${seq}`,
+    label: `Facteur ${seq}`,
+    direction: "up",
+    weight: 60,
+    ...overrides,
+  }
+}
+
+export function makeScoreCheckItem(
+  overrides: Partial<ScoreCheckItem> = {}
+): ScoreCheckItem {
+  seq += 1
+  return {
+    id: `ci-${seq}`,
+    label: `À vérifier ${seq}`,
+    ...overrides,
+  }
+}
+
+export function makeScoreDetail(
+  overrides: Partial<DossierScoreDetail> = {}
+): DossierScoreDetail {
+  seq += 1
+  return {
+    id: `s-${seq}`,
+    ...makeScore(82, "low"),
+    confidence: "high",
+    confidenceReason: "Sources bancaires complètes.",
+    calibrationNote: "Calibré sur 12 mois de relevés.",
+    factors: [makeScoreFactor()],
+    checkItems: [makeScoreCheckItem()],
+    ...overrides,
+  }
+}
+
+export function makeConnectionSource(
+  overrides: Partial<ConnectionSource> = {}
+): ConnectionSource {
+  seq += 1
+  return {
+    id: `src-${seq}`,
+    state: "connected",
+    label: `Source ${seq}`,
+    detail: null,
+    ...overrides,
+  }
+}
+
+export function makeHiddenAccount(
+  overrides: Partial<HiddenAccount> = {}
+): HiddenAccount {
+  seq += 1
+  return {
+    id: `ha-${seq}`,
+    ibanMasked: "FR76 **** **** 4242",
+    pattern: "Virements récurrents non déclarés",
+    ...overrides,
+  }
+}
+
+export function makeCompleteness(
+  overrides: Partial<DossierCompleteness> = {}
+): DossierCompleteness {
+  return {
+    gateStatus: "complet",
+    lastReminderAt: null,
+    sources: [makeConnectionSource()],
+    hiddenAccounts: [],
+    ...overrides,
+  }
+}
+
+export function makeIndicator(overrides: Partial<Indicator> = {}): Indicator {
+  seq += 1
+  return {
+    id: `ind-${seq}`,
+    label: `Indicateur ${seq}`,
+    value: "1,2",
+    threshold: null,
+    status: "conforme",
+    mitigants: [],
+    ...overrides,
+  }
+}
+
+export function makeAnalyse(
+  overrides: Partial<DossierAnalyse> = {}
+): DossierAnalyse {
+  return {
+    preAssessment: "Situation globalement saine.",
+    indicators: [makeIndicator()],
+    ...overrides,
+  }
+}
+
 export function makeAggregate(
   overrides: Partial<DossierAggregate> = {}
 ): DossierAggregate {
@@ -97,7 +205,9 @@ export function makeAggregate(
     company: makeCompany(),
     financingRequest: makeFinancingRequest(),
     documents: [makeDocument()],
-    score: { id: `s-${seq}`, ...makeScore(82, "low") },
+    score: makeScoreDetail({ id: `s-${seq}` }),
+    completeness: makeCompleteness(),
+    analyse: makeAnalyse(),
     ...overrides,
   }
 }
