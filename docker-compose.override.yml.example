@@ -9,7 +9,10 @@ services:
       NODE_ENV: development
       # Web dev server origin for CORS.
       CORS_ORIGIN: http://localhost:${WEB_DEV_PORT:-5173}
-    command: ["pnpm", "--filter", "./packages/api", "run", "start:dev"]
+    # Generate the Prisma client first (schema is bind-mounted, so this runs at
+    # start, not build), then NestJS watch. Filter by NAME — a path filter would
+    # resolve relative to WORKDIR (/repo/packages/api) and match nothing.
+    command: ["sh", "-c", "pnpm --filter @karmen/api exec prisma generate && pnpm --filter @karmen/api run start:dev"]
     volumes:
       - ./packages/api:/repo/packages/api
       - /repo/node_modules            # anonymous volume: keep in-image deps
@@ -23,9 +26,12 @@ services:
         VITE_API_BASE_URL: http://localhost:${API_PORT:-3000}
     environment:
       NODE_ENV: development
-    command: ["pnpm", "--filter", "./packages/web", "run", "dev", "--host", "0.0.0.0"]
+    command: ["pnpm", "--filter", "@karmen/web", "run", "dev", "--host", "0.0.0.0"]
     volumes:
       - ./packages/web:/repo/packages/web
+      # @karmen/ui is consumed as SOURCE by vite (its exports map points at
+      # src/*.tsx + globals.css), so the dev server needs the ui source mounted.
+      - ./packages/ui:/repo/packages/ui
       - /repo/node_modules
     ports:
       # Vite dev server (HMR) replaces the base file's preview mapping.
