@@ -16,8 +16,6 @@ A containerized full-stack prototype replacing the analyst's current manual inte
 | **Workspace / dossier detail** | Unified single-dossier view with cards for Company info, Score (explainable score + risk bucket), Financing request, and Documents. Replaces the analyst acting as an integration layer. | *Steps 1–3: Completeness, Scoring, Financial data* |
 | **API** | NestJS backend with Postgres. Exposes `GET /dossiers` (queue list) and `GET /dossiers/:id` (per-dossier aggregate: company + financing request + documents + score). Includes `GET /health` for deployment. Mock dossiers seeded at boot. | *Data integration & serving* |
 
-**Scope:** This is a **v0/v1 slice**. The automated evaluation engine and recommendation template (step 4 in CADRAGE.md) are framed as later phases, not yet built. Do not mistake the prototype for the full product—read CADRAGE.md for the complete vision.
-
 ## Prerequisites
 
 - **Docker Engine 25+** (or Docker Desktop) with the **Compose v2** plugin (`docker compose`)
