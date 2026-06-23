@@ -1,33 +1,24 @@
 # Karmen — Product Engineer Case Study
 
-This repository holds my case study for the **Product Engineer** position at [Karmen](https://www.getkarmen.com/).
+This repository holds a case study for the **Product Engineer** position at [Karmen](https://www.getkarmen.com/).
 
-## About
+## Summary
 
-A case study demonstrating product thinking and engineering execution: understanding the problem, shipping a focused solution, and explaining the trade-offs made along the way.
+Financing applications today take ~2 hours to analyze. The bottleneck is not analyst skill but **dysfunctional product architecture**: the analyst must manually verify document completeness *and* manually integrate data across disconnected modules. This case study builds a **unified dossier workspace** with explainable scoring to move toward "review-by-exception"—clean dossiers validated in seconds, analyst time focused on complex cases.
 
-## Structure
+The thesis: **automate the deterministic, preserve judgment.** Target: ~30min average throughput. For the full product framing, motivation, and roadmap, see [CADRAGE.md](./CADRAGE.md) — this document explains why each step matters and how the prototype phases toward that goal.
 
-```
-.
-├── README.md                              # You are here
-├── CLAUDE.md                              # AI agent guidance
-├── AGENTS.md                              # Agent routing guide
-├── CADRAGE.md                             # Product framing
-├── docker-compose.yml                     # Main compose config
-├── docker-compose.override.yml.example    # Dev overrides template (copy to use)
-├── .env.example                           # Environment template
-├── packages/
-│   ├── api/                               # NestJS backend
-│   │   ├── Dockerfile
-│   │   └── README.md
-│   ├── web/                               # React frontend
-│   │   ├── Dockerfile
-│   │   └── README.md
-│   └── ui/                                # @karmen/ui — shared shadcn/ui component library
-│       └── README.md
-└── docs/                                  # Case study write-up, notes, decisions
-```
+## What we build
+
+A containerized full-stack prototype replacing the analyst's current manual integration work. The analyst's workflow is split into four steps (see CADRAGE.md for rationale); this prototype delivers the workspace and explainable scoring (steps 1–3):
+
+| Component | What it does | Addresses CADRAGE step |
+|-----------|-------------|------------------------|
+| **Queue** | React screen showing the analyst's worklist of financing dossiers, sorted by risk, with explainable score per row. Entry point for review-by-exception. | *Review workflow* |
+| **Workspace / dossier detail** | Unified single-dossier view with cards for Company info, Score (explainable score + risk bucket), Financing request, and Documents. Replaces the analyst acting as an integration layer. | *Steps 1–3: Completeness, Scoring, Financial data* |
+| **API** | NestJS backend with Postgres. Exposes `GET /dossiers` (queue list) and `GET /dossiers/:id` (per-dossier aggregate: company + financing request + documents + score). Includes `GET /health` for deployment. Mock dossiers seeded at boot. | *Data integration & serving* |
+
+**Scope:** This is a **v0/v1 slice**. The automated evaluation engine and recommendation template (step 4 in CADRAGE.md) are framed as later phases, not yet built. Do not mistake the prototype for the full product—read CADRAGE.md for the complete vision.
 
 ## Onboarding
 
@@ -95,6 +86,29 @@ Discrete Postgres variables are the **source of truth**; `DATABASE_URL` is deriv
 - API runtime image runs as unprivileged `node` user.
 - Secrets from `.env` only, never in layers.
 - Single-arch, local-only.
+
+## Structure
+
+```
+.
+├── README.md                              # You are here
+├── CLAUDE.md                              # AI agent guidance
+├── AGENTS.md                              # Agent routing guide
+├── CADRAGE.md                             # Product framing
+├── docker-compose.yml                     # Main compose config
+├── docker-compose.override.yml.example    # Dev overrides template (copy to use)
+├── .env.example                           # Environment template
+├── packages/
+│   ├── api/                               # NestJS backend
+│   │   ├── Dockerfile
+│   │   └── README.md
+│   ├── web/                               # React frontend
+│   │   ├── Dockerfile
+│   │   └── README.md
+│   └── ui/                                # @karmen/ui — shared shadcn/ui component library
+│       └── README.md
+└── docs/                                  # Case study write-up, notes, decisions
+```
 
 ## Status
 
