@@ -31,6 +31,7 @@ Four containerized services (Docker 25, Compose v2): **web** (React/Vite), **api
 
 ```bash
 git clone git@github.com:luctst/karmen.git && cd karmen
+pnpm i
 cp .env.example .env
 # edit .env — set a real PGPASSWORD
 ```
