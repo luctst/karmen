@@ -18,16 +18,16 @@ A containerized full-stack prototype replacing the analyst's current manual inte
 
 **Scope:** This is a **v0/v1 slice**. The automated evaluation engine and recommendation template (step 4 in CADRAGE.md) are framed as later phases, not yet built. Do not mistake the prototype for the full product—read CADRAGE.md for the complete vision.
 
-## Onboarding
-
-Four containerized services (Docker 25, Compose v2): **web** (React/Vite), **api** (NestJS), **db** (Postgres 16), **migrate** (one-shot Prisma runner). Local-only, separate origins, CORS enabled. For full package contracts, see `packages/api/README.md` and `packages/web/README.md`. Shared UI components live in `packages/ui` (`@karmen/ui`) — see `packages/ui/README.md`.
-
-### Prerequisites
+## Prerequisites
 
 - **Docker Engine 25+** (or Docker Desktop) with the **Compose v2** plugin (`docker compose`)
 - **Git**
 
 Everything else (Node 20, pnpm) runs inside the containers — nothing else to install on the host.
+
+## Onboarding
+
+Four containerized services (Docker 25, Compose v2): **web** (React/Vite), **api** (NestJS), **db** (Postgres 16), **migrate** (one-shot Prisma runner). Local-only, separate origins, CORS enabled. For full package contracts, see `packages/api/README.md` and `packages/web/README.md`. Shared UI components live in `packages/ui` (`@karmen/ui`) — see `packages/ui/README.md`.
 
 ### First-time setup
 
@@ -108,7 +108,3 @@ Discrete Postgres variables are the **source of truth**; `DATABASE_URL` is deriv
 │       └── README.md
 └── docs/                                  # Case study write-up, notes, decisions
 ```
-
-## Status
-
-🚧 Work in progress.
