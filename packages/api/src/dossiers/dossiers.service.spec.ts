@@ -3,7 +3,6 @@ import { NotFoundException } from '@nestjs/common';
 import type { PrismaService } from '../prisma/prisma.service';
 import { DossiersService } from './dossiers.service';
 
-// Minimal mock surface: only the two finder methods the service touches.
 interface PrismaMock {
   financingRequest: {
     findMany: jest.Mock;
@@ -21,8 +20,6 @@ function createPrismaMock(): PrismaMock {
 }
 
 function asPrismaService(mock: PrismaMock): PrismaService {
-  // The service only calls financingRequest.findMany/findUnique; this mock
-  // satisfies that contract for the unit under test.
   return mock as unknown as PrismaService;
 }
 

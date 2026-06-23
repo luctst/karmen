@@ -7,8 +7,7 @@ import type {
   DossierQueueItem,
 } from './dossiers.types';
 
-// Prisma payload types derived from the includes below. Keeping them named and
-// derived (rather than `any`) means the mappers stay honest if the schema moves.
+// Derived from the includes below so the mappers break loudly if the schema moves.
 type QueueRecord = Prisma.FinancingRequestGetPayload<{
   include: {
     company: { select: { id: true; name: true; siren: true; businessType: true } };

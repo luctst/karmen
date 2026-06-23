@@ -1,10 +1,6 @@
-/**
- * Idempotent seed for the Karmen API.
- *
- * Seeds ~4 dossiers covering queue variety (high/low/medium risk + an
- * incomplete one with no score). Keyed by id via `upsert`, so re-running
- * `prisma db seed` is safe — the Docker `migrate` service runs it on every up.
- */
+// Idempotent: keyed by id via upsert, so re-running (the Docker migrate service
+// runs it on every up) is safe. Covers queue variety: high/low/medium risk + an
+// incomplete dossier with no score.
 import {
   DocumentType,
   FinancingType,
@@ -51,7 +47,7 @@ interface SeedDossier {
 }
 
 const dossiers: SeedDossier[] = [
-  // 1 — high risk, full docs (the provided fr-003 example, verbatim).
+  // high risk, full docs (the provided fr-003 example, verbatim)
   {
     company: {
       id: 'c-003',
@@ -113,7 +109,7 @@ const dossiers: SeedDossier[] = [
     score: { id: 's-003', riskBucket: RiskBucket.high, globalScore: 34 },
   },
 
-  // 2 — clean, low risk, full docs.
+  // clean, low risk, full docs
   {
     company: {
       id: 'c-001',
@@ -159,7 +155,7 @@ const dossiers: SeedDossier[] = [
     score: { id: 's-001', riskBucket: RiskBucket.low, globalScore: 82 },
   },
 
-  // 3 — incomplete, awaiting client, no score, no docs.
+  // incomplete, awaiting client, no score, no docs
   {
     company: {
       id: 'c-002',
@@ -188,7 +184,7 @@ const dossiers: SeedDossier[] = [
     score: null,
   },
 
-  // 4 — medium risk, partial docs.
+  // medium risk, partial docs
   {
     company: {
       id: 'c-004',

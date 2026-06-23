@@ -18,16 +18,9 @@ import {
 
 import { cn } from "@karmen/ui/lib/utils"
 
-/**
- * StatusBadge — the single source of truth for status rendering (DESIGN.md
- * §6/§7). It is the ONLY component that paints a status color; nothing else
- * hand-rolls a colored chip.
- *
- * Color-is-never-alone (§5): every badge renders icon + text label + color,
- * always all three. An aria-label combines the status with the optional
- * context so a screen reader gets the full verdict.
- */
-
+// The only component that paints a status color — nothing else hand-rolls a chip.
+// color-is-never-alone (§5): always icon + text + color; aria-label carries the
+// full verdict (status + optional context).
 type StatusFamily = "clean" | "warn" | "block" | "neutral" | "info"
 
 type StatusKey =
@@ -51,7 +44,6 @@ type StatusDefinition = {
   icon: LucideIcon
 }
 
-/** §7 status table. Extend here as new keys are needed app-wide. */
 const STATUS: Record<StatusKey, StatusDefinition> = {
   clean: { family: "clean", label: "Propre", icon: CheckCircle2 },
   anomaly_notable: {
@@ -108,9 +100,9 @@ const badgeVariants = cva(
 type StatusBadgeProps = Omit<React.ComponentProps<"span">, "children"> &
   VariantProps<typeof badgeVariants> & {
     status: StatusKey
-    /** Optional override for the visible label (e.g. "Risque modéré"). */
+    // Optional override for the visible label.
     label?: string
-    /** Context appended to the aria-label (e.g. "risque élevé"). */
+    // Appended to the aria-label for screen-reader context.
     context?: string
   }
 
