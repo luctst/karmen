@@ -45,6 +45,14 @@ ARG NODE_VERSION=20
 FROM node:${NODE_VERSION}-bookworm-slim AS deps
 WORKDIR /repo
 
+# Prisma's query engine dynamically links libssl; the slim image omits it,
+# which triggers `prisma:warn ... failed to detect the libssl/openssl version`
+# and a fallback to the wrong (openssl-1.1.x) engine. Installing openssl lets
+# Prisma resolve the correct debian-openssl-3.0.x engine on bookworm. This
+# stage backs `migrate` and `dev`, which both run Prisma. (Cleaned in-layer.)
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 # Enable pnpm through corepack, pinned to the same version as the root
 # package.json `packageManager` field. Keep this in sync if you bump pnpm.
 RUN corepack enable && corepack prepare pnpm@10.32.1 --activate
@@ -68,8 +76,12 @@ COPY packages/web/package.json ./packages/web/package.json
 # --frozen-lockfile fails (rather than mutating the lockfile) if it is out of
 # sync — the CI/prod-safe equivalent of `npm ci`. The BuildKit cache mount
 # keeps pnpm's store warm across builds without baking it into a layer.
+# --ignore-scripts skips lifecycle hooks: the root `prepare` runs `husky` (git
+# hook setup) which is meaningless in an image and absent in a --prod tree. We
+# run `prisma generate` explicitly (build + migrate stages), so no dependency
+# postinstall is relied upon here either.
 RUN --mount=type=cache,target=/pnpm/store \
-    pnpm install --frozen-lockfile
+    pnpm install --frozen-lockfile --ignore-scripts
 
 # ---- Stage 2: build (compile TS) ------------------------------------------
 FROM deps AS build
@@ -98,16 +110,43 @@ COPY packages/web/package.json ./packages/web/package.json
 # --prod skips devDependencies; --filter scopes the install to the API
 # workspace BY PATH (subpackage names are future contracts, not defined yet).
 RUN --mount=type=cache,target=/pnpm/store \
-    pnpm install --frozen-lockfile --prod --filter ./packages/api
+    pnpm install --frozen-lockfile --prod --filter ./packages/api --ignore-scripts
 
 # ---- Stage 4: runtime -----------------------------------------------------
+# IMPORTANT: we mirror the /repo workspace layout instead of flattening to /app.
+# pnpm uses an isolated node_modules: the API's direct deps live as symlinks in
+# packages/api/node_modules/* -> ../../../../node_modules/.pnpm/<pkg>. Those
+# relative links only resolve if the repo-root node_modules AND the per-package
+# node_modules keep their relative distance. Flattening would break `require()`
+# (e.g. Cannot find module '@nestjs/common'). WORKDIR is the API package; the
+# entrypoint is still dist/main.js relative to it (contract preserved).
 FROM node:${NODE_VERSION}-bookworm-slim AS runtime
 ENV NODE_ENV=production
-WORKDIR /app
+WORKDIR /repo/packages/api
 
-# Drop privileges. The node image ships an unprivileged `node` user.
-# Copy artifacts with correct ownership.
-COPY --chown=node:node --from=prod-deps /repo/node_modules ./node_modules
+# Prisma's query engine needs libssl at runtime too (see the deps stage note).
+# Without it the engine warns and loads the wrong target. (Cleaned in-layer.)
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Drop privileges. The node image ships an unprivileged `node` user. Copy the
+# pnpm virtual store (repo-root node_modules) AND the API package's symlink tree,
+# preserving their relative positions so the symlinks resolve.
+COPY --chown=node:node --from=prod-deps /repo/node_modules /repo/node_modules
+COPY --chown=node:node --from=prod-deps /repo/packages/api/node_modules ./node_modules
+# prod-deps runs `pnpm install` only — it never runs `prisma generate`, so the
+# generated client is absent and the API would crash on its first Prisma query.
+# Under pnpm's isolated layout the client is generated INTO the virtual store,
+# beside the @prisma/client package the workspace symlinks resolve to:
+#   node_modules/.pnpm/@prisma+client@<ver+peerhash>/node_modules/.prisma
+# Overlay just that generated `.prisma` from `build` (DRY: reuse build's generate
+# output — incl. the debian-openssl-3.0.x engine — rather than re-provisioning
+# pnpm + schema on this slim base). The .pnpm dir name is lockfile-pinned, so it
+# is byte-identical in prod-deps; this hardcoded path is the maintenance contract
+# (update it if the lockfile's @prisma/client peer set changes).
+COPY --chown=node:node --from=build \
+  /repo/node_modules/.pnpm/@prisma+client@6.19.3_prisma@6.19.3_typescript@5.9.3__typescript@5.9.3/node_modules/.prisma \
+  /repo/node_modules/.pnpm/@prisma+client@6.19.3_prisma@6.19.3_typescript@5.9.3__typescript@5.9.3/node_modules/.prisma
 COPY --chown=node:node --from=build     /repo/packages/api/dist ./dist
 COPY --chown=node:node --from=build     /repo/packages/api/package.json ./package.json
 
@@ -140,6 +179,11 @@ WORKDIR /repo
 # Bring in the API source (prisma/schema.prisma, prisma/seed.ts, migrations).
 COPY packages/api ./packages/api
 WORKDIR /repo/packages/api
+# Generate the Prisma client at build time (cached layer). `deps` is install-only
+# and never ran generate, so without this the seed's `new PrismaClient()` throws
+# `Cannot find module '.prisma/client/default'`. `generate` reads the schema only
+# — no DB connection needed — so it is safe here, before the DB exists.
+RUN pnpm exec prisma generate
 # Prisma reads DATABASE_URL from the environment (injected by compose).
 # `pnpm exec` runs the workspace-local Prisma CLI binary (resolved from the
 # deps tree) — the pnpm equivalent of `npx`.
@@ -153,6 +197,6 @@ ENV NODE_ENV=development
 WORKDIR /repo/packages/api
 ENV PORT=3000
 EXPOSE 3000
-# `start:dev` is the NestJS watch-mode script. The app must define it.
-# --filter targets the API workspace BY PATH (names are future contracts).
-CMD ["pnpm", "--filter", "./packages/api", "run", "start:dev"]
+# `start:dev` is the NestJS watch-mode script. Filter by package NAME — a path
+# filter would resolve relative to this WORKDIR (/repo/packages/api) and match nothing.
+CMD ["pnpm", "--filter", "@karmen/api", "run", "start:dev"]
