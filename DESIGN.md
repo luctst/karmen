@@ -177,6 +177,7 @@ This table governs **every badge and state in the app.** `StatusBadge` is the on
 | `incomplete_action` | Incomplet — action requise | `status-warn` | `CircleAlert` | filled-alert | Queue, Complétude gate |
 | `incomplete_waiting` | Incomplet — en attente client | `status-neutral` | `Clock` | clock | Queue, Complétude gate |
 | `pending` | En attente / en cours | `status-neutral` | `Loader`/`Clock` | clock | Connection rows |
+| `decided` | Décidé / Refusé (terminal) | `status-neutral` | `CircleSlash` | slash | Queue (closed dossiers) |
 | `failed` | Échec connexion | `status-block` | `PlugZap`/`XCircle` | x | ConnectionStatusRow |
 | `fallback` | Repli (upload manuel) | `status-warn` | `FileUp` | up-arrow | ConnectionStatusRow |
 | `conf_high` | Confiance élevée | `status-clean` | `ShieldCheck` | shield | ConfidenceSignal |
