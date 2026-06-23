@@ -44,6 +44,8 @@ The exception view leads with system-written prose and discrete, actionable item
 - **From a Bloomberg terminal:** information density is a feature. A professional reading 40 dossiers a day does not want a marketing-grade card with 32px padding around three numbers. Tight, scannable, numeric.
 - **From Stripe dashboard:** financial data presented with sobriety and credibility. Color is semantic, never festive. Numbers are tabular and aligned. Nothing feels playful, because money decisions aren't.
 
+**Two color economies — they never compete.** The chrome is not pure greyscale; it carries a single, restrained **brand accent** (Karmen identity) on *interactive and identity* surfaces only — the wordmark, primary actions, focus ring, active nav, links. The accent is calm and ambient; it says "this is a Karmen tool you are operating," not "look here." **Status color** is the loud, semantic channel reserved for verdicts and severity. Because the accent lives on chrome/affordances and status lives on data/verdicts, they occupy different planes and never fight for the same attention. A healthy screen is still ~95% neutral; the only chromatic things are the wordmark, the one primary action, and whatever status genuinely needs the analyst.
+
 **What Karmen is NOT:** not airy, not friendly-cartoonish, not gamified, no celebratory confetti, no illustration-heavy empty states. The personality is a **calm expert colleague** — terse, precise, never alarmist, never cute. When the system is confident it says so plainly; when it is unsure it admits it without drama.
 
 **Voice in copy:** declarative, French (analyst-facing), short. "12 mois disponibles — conforme." not "Great news! You have all the data you need 🎉". Status reads like a colleague's note, not a notification.
@@ -90,7 +92,15 @@ Whitespace is spent to separate *decisions*, not to pad data. If two numbers are
 
 ## 5. Color & semantics
 
-Built on the existing shadcn **neutral oklch base** (see `packages/ui/src/styles/globals.css`). The chrome stays monochrome; **color is reserved exclusively for status and severity.** A screen with no problems is almost entirely neutral. Color appearing on screen *means something needs attention* — that is the signal economy.
+Built on the existing shadcn **neutral oklch base** (see `packages/ui/src/styles/globals.css`). The chrome is monochrome **plus one brand accent**; **semantic status/severity color is reserved exclusively for verdicts.** A screen with no problems is almost entirely neutral. Status color appearing on screen *means something needs attention* — that is the signal economy. The brand accent is exempt from the signal economy because it never marks a verdict.
+
+### Brand accent (identity layer)
+
+A single accent token, `--brand` (+ `--brand-foreground`), carries Karmen's identity on the chrome. It is **calm, low-frequency, and ambient** — present on at most a few elements per screen.
+
+- **Allowed on:** the wordmark / logo mark; the one primary action per view (`Valider`, `Ouvrir`); the focus ring (`--ring` maps to brand); active/selected nav and tab states; text links and inline interactive affordances; the row hover chevron tint.
+- **Forbidden on:** anything that reads as a verdict — status badges, score numerals, risk categories, severity borders, completeness gates, group-header tiers. Never a brand-tinted card background, never a brand gradient, never decorative fills. If color on an element would make the analyst *act or worry*, it must be a status token, not the brand.
+- **Discipline test:** if removing the accent from an element loses identity but loses no meaning, it was a correct use. If it loses meaning, that element should have been a status token.
 
 ### Status color tokens (to add as CSS variables in `globals.css`)
 
