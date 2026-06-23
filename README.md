@@ -22,9 +22,17 @@ A containerized full-stack prototype replacing the analyst's current manual inte
 
 Four containerized services (Docker 25, Compose v2): **web** (React/Vite), **api** (NestJS), **db** (Postgres 16), **migrate** (one-shot Prisma runner). Local-only, separate origins, CORS enabled. For full package contracts, see `packages/api/README.md` and `packages/web/README.md`. Shared UI components live in `packages/ui` (`@karmen/ui`) — see `packages/ui/README.md`.
 
+### Prerequisites
+
+- **Docker Engine 25+** (or Docker Desktop) with the **Compose v2** plugin (`docker compose`)
+- **Git**
+
+Everything else (Node 20, pnpm) runs inside the containers — nothing else to install on the host.
+
 ### First-time setup
 
 ```bash
+git clone git@github.com:luctst/karmen.git && cd karmen
 cp .env.example .env
 # edit .env — set a real PGPASSWORD
 ```
