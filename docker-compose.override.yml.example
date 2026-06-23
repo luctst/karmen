@@ -1,5 +1,4 @@
-# Local development override (hot reload). Copy to docker-compose.override.yml to activate.
-# See the "Development stack" section in the root README.md for how this works and what it changes.
+# Dev override: hot reload. Copy to docker-compose.override.yml to activate.
 
 services:
   api:
@@ -7,32 +6,23 @@ services:
       target: dev
     environment:
       NODE_ENV: development
-      # Web dev server origin for CORS.
       CORS_ORIGIN: http://localhost:${WEB_DEV_PORT:-5173}
-    # Generate the Prisma client first (schema is bind-mounted, so this runs at
-    # start, not build), then NestJS watch. Filter by NAME — a path filter would
-    # resolve relative to WORKDIR (/repo/packages/api) and match nothing.
     command: ["sh", "-c", "pnpm --filter @karmen/api exec prisma generate && pnpm --filter @karmen/api run start:dev"]
     volumes:
       - ./packages/api:/repo/packages/api
-      - /repo/node_modules            # anonymous volume: keep in-image deps
-    # api host port stays as defined in the base file (API_PORT -> 3000)
+      - /repo/node_modules
 
   web:
     build:
       target: dev
       args:
-        # In dev the SPA calls the API at its published host origin.
         VITE_API_BASE_URL: http://localhost:${API_PORT:-3000}
     environment:
       NODE_ENV: development
     command: ["pnpm", "--filter", "@karmen/web", "run", "dev", "--host", "0.0.0.0"]
     volumes:
       - ./packages/web:/repo/packages/web
-      # @karmen/ui is consumed as SOURCE by vite (its exports map points at
-      # src/*.tsx + globals.css), so the dev server needs the ui source mounted.
       - ./packages/ui:/repo/packages/ui
       - /repo/node_modules
     ports:
-      # Vite dev server (HMR) replaces the base file's preview mapping.
       - "${WEB_DEV_PORT:-5173}:5173"
