@@ -1,0 +1,101 @@
+// Karmen API — Prisma schema.
+// Datasource reads DATABASE_URL (assembled from PG* vars by docker-compose).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum FinancingType {
+  loan
+  line_of_credit
+  factoring
+  leasing
+}
+
+enum RequestStatus {
+  pending_review
+  info_requested
+  awaiting_client
+  approved
+  rejected
+  blocked
+}
+
+enum DocumentType {
+  liasse_fiscale
+  releve_bancaire
+}
+
+enum RiskBucket {
+  low
+  medium
+  high
+}
+
+model Company {
+  id            String    @id
+  name          String
+  siren         String    @unique
+  businessType  String?
+  legalCategory String?
+  codeNaf       String?
+  creationDate  DateTime?
+  address       String?
+  countryCode   String?   @default("FR")
+  postalCode    String?
+  owner         String?
+
+  financingRequests FinancingRequest[]
+  documents         Document[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FinancingRequest {
+  id              String        @id
+  type            FinancingType
+  status          RequestStatus @default(pending_review)
+  companyId       String
+  company         Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  fundUsage       String?
+  rejectedReason  String?
+  amount          Int
+  durationInMonth Int
+  interestRate    Float?
+
+  documents Document[]
+  score     Score?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Document {
+  id                 String           @id
+  name               String
+  type               DocumentType
+  companyId          String
+  company            Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  financingRequestId String
+  financingRequest   FinancingRequest @relation(fields: [financingRequestId], references: [id], onDelete: Cascade)
+  metadata           Json?
+
+  createdAt DateTime @default(now())
+}
+
+model Score {
+  id                 String           @id
+  financingRequestId String           @unique
+  financingRequest   FinancingRequest @relation(fields: [financingRequestId], references: [id], onDelete: Cascade)
+  riskBucket         RiskBucket
+  globalScore        Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
