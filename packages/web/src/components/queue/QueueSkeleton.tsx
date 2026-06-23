@@ -1,11 +1,12 @@
 // Preserves the list layout while loading (no spinner-on-blank).
+// Mirrors QueueRow column widths so loading→loaded doesn't shift.
 const ROW_COUNT = 7
 
 export function QueueSkeleton() {
   return (
-    <div aria-busy="true" aria-label="Chargement de la file" className="px-6">
-      <div className="mb-2 h-4 w-40 animate-pulse rounded-sm bg-muted" />
-      <div className="space-y-1">
+    <div aria-busy="true" aria-label="Chargement de la file" className="p-3">
+      <div className="mb-2 ml-3 h-4 w-40 animate-pulse rounded-full bg-muted" />
+      <div className="space-y-0.5">
         {Array.from({ length: ROW_COUNT }).map((_, index) => (
           <div
             key={`queue-skeleton-${index}`}
@@ -13,7 +14,7 @@ export function QueueSkeleton() {
           >
             <div className="h-5 w-52 shrink-0 animate-pulse rounded-sm bg-muted" />
             <div className="h-4 flex-1 animate-pulse rounded-sm bg-muted" />
-            <div className="h-4 w-44 shrink-0 animate-pulse rounded-sm bg-muted" />
+            <div className="h-4 w-28 shrink-0 animate-pulse rounded-sm bg-muted" />
             <div className="h-4 w-40 shrink-0 animate-pulse rounded-sm bg-muted" />
           </div>
         ))}

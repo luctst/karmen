@@ -21,8 +21,10 @@ export function QueueRow({ dossier }: QueueRowProps) {
       to={`/dossiers/${dossier.id}`}
       role="listitem"
       className={cn(
-        "group flex h-11 items-center gap-3 rounded-sm px-3 py-2 text-sm",
-        "outline-none transition-colors hover:bg-accent",
+        "group relative flex h-11 items-center gap-3 rounded-sm px-3 py-2 text-sm",
+        "outline-none transition-colors duration-150 motion-reduce:transition-none",
+        "hover:bg-surface-row-hover active:bg-muted",
+        "before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:rounded-full before:bg-transparent group-hover:before:bg-brand",
         "focus-visible:ring-[2px] focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
       )}
     >
@@ -35,28 +37,30 @@ export function QueueRow({ dossier }: QueueRowProps) {
       </div>
 
       <span
-        className="min-w-0 flex-1 truncate font-medium text-foreground"
+        className="min-w-0 flex-1 truncate text-[15px] font-medium text-foreground"
         title={dossier.company.name}
       >
         {dossier.company.name}
       </span>
 
-      <span className="w-44 shrink-0 text-right font-mono text-sm tabular-nums">
+      <span className="w-28 shrink-0 text-right">
         <span className="sr-only">
           {score.isUnknown
             ? "Score indisponible"
             : `Score ${score.value} sur 100, catégorie ${score.category}, ${score.riskPhrase}`}
         </span>
         {score.isUnknown ? (
-          <span aria-hidden="true" className="text-muted-foreground">
+          <span
+            aria-hidden="true"
+            className="font-mono text-sm tabular-nums text-muted-foreground"
+          >
             — / —
           </span>
         ) : (
           <span aria-hidden="true">
-            <span className="text-foreground">
+            <span className="font-mono text-[15px] font-semibold tabular-nums text-foreground">
               {score.value} / {score.category}
             </span>
-            <span className="text-muted-foreground"> — {score.riskPhrase}</span>
           </span>
         )}
       </span>
@@ -68,7 +72,7 @@ export function QueueRow({ dossier }: QueueRowProps) {
       <ChevronRight
         size={16}
         aria-hidden="true"
-        className="shrink-0 text-muted-foreground transition-colors group-hover:text-foreground"
+        className="shrink-0 text-muted-foreground transition-colors duration-150 group-hover:text-brand-muted motion-reduce:transition-none"
       />
     </Link>
   )

@@ -1,8 +1,11 @@
 import type { ComponentType, ReactNode } from "react"
 import type { LucideProps } from "lucide-react"
 
+import { cn } from "@karmen/ui/lib/utils"
+
 type EmptyStateProps = {
   icon: ComponentType<LucideProps>
+  iconClassName?: string
   title: string
   description?: string
   action?: ReactNode
@@ -10,6 +13,7 @@ type EmptyStateProps = {
 
 export function EmptyState({
   icon: Icon,
+  iconClassName,
   title,
   description,
   action,
@@ -18,7 +22,7 @@ export function EmptyState({
     <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
       <Icon
         size={28}
-        className="text-muted-foreground"
+        className={cn("text-muted-foreground", iconClassName)}
         aria-hidden="true"
         strokeWidth={1.5}
       />
