@@ -1,0 +1,10 @@
+/* Web app stylesheet. Pulls the @karmen/ui theme (neutral base + status
+   layer) then declares the Tailwind @source globs so neither the web src
+   nor the ui package src get tree-shaken.
+
+   Path note: this file lives at packages/web/src/styles/globals.css, so the
+   ui package src is three levels up then into ../ui/src. */
+@import "@karmen/ui/globals.css";
+
+@source "../**/*.{ts,tsx}";
+@source "../../../ui/src/**/*.{ts,tsx}";
