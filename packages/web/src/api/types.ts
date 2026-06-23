@@ -1,4 +1,3 @@
-// Hand-kept mirror of the API DTOs — keep in sync by inspection (no codegen yet).
 export type DossierStatus =
   | "pending_review"
   | "info_requested"
@@ -11,11 +10,27 @@ export type RiskBucket = "low" | "medium" | "high"
 
 export type FinancingType = "loan" | "line_of_credit" | "factoring" | "leasing"
 
+export type DocumentType = "liasse_fiscale" | "releve_bancaire"
+
+export type CompanySummary = {
+  id: string
+  name: string
+  siren: string
+  businessType: string | null
+}
+
 export type Company = {
   id: string
   name: string
   siren: string
-  businessType: string
+  businessType: string | null
+  legalCategory: string | null
+  codeNaf: string | null
+  creationDate: string | null
+  address: string | null
+  countryCode: string | null
+  postalCode: string | null
+  owner: string | null
 }
 
 export type DossierScore = {
@@ -23,10 +38,9 @@ export type DossierScore = {
   globalScore: number
 }
 
-// GET /dossiers
 export type DossierSummary = {
   id: string
-  company: Company
+  company: CompanySummary
   type: FinancingType
   status: DossierStatus
   amount: number
@@ -34,16 +48,27 @@ export type DossierSummary = {
   score: DossierScore | null
 }
 
-// GET /dossiers/:id (subset the Workspace stub consumes)
-export type DossierDetail = {
+export type DossierDocument = {
+  id: string
+  name: string
+  type: DocumentType
+  metadata: unknown
+}
+
+export type DossierFinancingRequest = {
+  id: string
+  type: FinancingType
+  status: DossierStatus
+  fundUsage: string | null
+  rejectedReason: string | null
+  amount: number
+  durationInMonth: number
+  interestRate: number | null
+}
+
+export type DossierAggregate = {
   company: Company
-  financingRequest: {
-    id: string
-    type: FinancingType
-    status: DossierStatus
-    amount: number
-    durationInMonth: number
-  }
-  documents: Array<{ id: string; name: string; type: string }>
-  score: DossierScore | null
+  financingRequest: DossierFinancingRequest
+  documents: DossierDocument[]
+  score: (DossierScore & { id: string }) | null
 }

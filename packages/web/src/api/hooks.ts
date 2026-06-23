@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 
 import { apiGet } from "./client"
-import type { DossierDetail, DossierSummary } from "./types"
+import type { DossierAggregate, DossierSummary } from "./types"
 
 type AsyncState<T> = {
   data: T | null
@@ -9,8 +9,6 @@ type AsyncState<T> = {
   error: Error | null
 }
 
-// No react-query yet — no mutations to justify it; add it when writes (Valider,
-// override) arrive. Aborts in-flight requests on unmount/refetch.
 export function useQueue() {
   const [state, setState] = useState<AsyncState<DossierSummary[]>>({
     data: null,
@@ -49,11 +47,14 @@ export function useQueue() {
 }
 
 export function useDossier(id: string | undefined) {
-  const [state, setState] = useState<AsyncState<DossierDetail>>({
+  const [state, setState] = useState<AsyncState<DossierAggregate>>({
     data: null,
     isLoading: true,
     error: null,
   })
+  const [reloadToken, setReloadToken] = useState(0)
+
+  const refetch = useCallback(() => setReloadToken((token) => token + 1), [])
 
   useEffect(() => {
     if (!id) {
@@ -68,7 +69,7 @@ export function useDossier(id: string | undefined) {
     const controller = new AbortController()
     setState({ data: null, isLoading: true, error: null })
 
-    apiGet<DossierDetail>(`/dossiers/${id}`, { signal: controller.signal })
+    apiGet<DossierAggregate>(`/dossiers/${id}`, { signal: controller.signal })
       .then((data) => {
         if (controller.signal.aborted) return
         setState({ data, isLoading: false, error: null })
@@ -86,7 +87,7 @@ export function useDossier(id: string | undefined) {
       })
 
     return () => controller.abort()
-  }, [id])
+  }, [id, reloadToken])
 
-  return state
+  return { ...state, refetch }
 }
