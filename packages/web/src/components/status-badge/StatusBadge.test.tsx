@@ -3,11 +3,8 @@ import { render, screen } from "@testing-library/react"
 
 import { StatusBadge } from "@karmen/ui/components/status-badge"
 
-/**
- * StatusBadge contract (DESIGN.md §5/§7): color-is-never-alone. Every badge
- * must carry a visible text label and an aria-label that includes context, so
- * a screen reader (and a colorblind user) gets the full verdict without color.
- */
+// color-is-never-alone: every badge carries visible text + an aria-label, so the
+// verdict survives without color (§5/§7).
 describe("StatusBadge", () => {
   it("renders the default label text for the clean family", () => {
     render(<StatusBadge status="clean" />)
@@ -16,7 +13,6 @@ describe("StatusBadge", () => {
 
   it("renders a visible text label, not just a colored chip (block family)", () => {
     render(<StatusBadge status="anomaly_blocking" label="Risque élevé" />)
-    // The meaning is carried by readable text, asserted by content.
     expect(screen.getByText("Risque élevé")).toBeInTheDocument()
   })
 

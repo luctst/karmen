@@ -1,25 +1,12 @@
 import type { DossierScore } from "../../api/types"
 
-/**
- * Score → A–E category + risk phrase derivation.
- *
- * The API gives a 0–100 `globalScore` and a `riskBucket`. We render the
- * category WORD as the bearer of meaning (P2 / a11y): color reinforces, the
- * word decides.
- *
- * Category band (globalScore):  A >=80 · B 65–79 · C 50–64 · D 35–49 · E <35
- * Risk phrase comes from the API's riskBucket (the authoritative signal),
- * falling back to the band when no bucket is present.
- */
-
+// Bands (globalScore): A >=80 · B 65–79 · C 50–64 · D 35–49 · E <35.
+// Risk phrase comes from the API's riskBucket — the authoritative signal.
 export type ScoreDisplay = {
-  /** e.g. "82" — already a string, mono tabular-nums at the call site. */
   value: string
-  /** e.g. "A" */
   category: string
-  /** e.g. "Risque faible" */
   riskPhrase: string
-  /** True when there is no score → render "— / —" muted, never "0". */
+  // No score → "— / —" muted, never a fabricated "0".
   isUnknown: boolean
 }
 

@@ -2,15 +2,9 @@ import type { StatusKey } from "@karmen/ui/components/status-badge"
 
 import type { DossierSummary } from "../../api/types"
 
-/**
- * Queue domain logic — kept pure and out of the presentation layer.
- *
- * The 5-tier priority ladder is derived from `status` + `riskBucket` because
- * the completeness / anomaly-count data the design imagines doesn't exist in
- * the API yet. We map honestly to what we have, ordered by ACTIONABILITY
- * (review-by-exception, P5), not chronology.
- */
-
+// The priority ladder is derived from status + riskBucket because the
+// completeness/anomaly-count data the design imagines doesn't exist in the API
+// yet. Ordered by actionability, not chronology.
 export type QueueTier =
   | "fast_close"
   | "exceptions"
@@ -25,7 +19,7 @@ export type QueueGroup = {
   dossiers: DossierSummary[]
 }
 
-/** Display order = priority order. Earlier = louder / more actionable. */
+// Display order = priority order; earlier = more actionable.
 const TIER_ORDER: QueueTier[] = [
   "fast_close",
   "exceptions",
@@ -44,13 +38,11 @@ const TIER_LABELS: Record<QueueTier, string> = {
   decided: "Décidés",
 }
 
-/** Map a dossier to its priority tier. */
 export function tierFor(dossier: DossierSummary): QueueTier {
   const { status, score } = dossier
 
   switch (status) {
     case "pending_review":
-      // Low risk → a fast close; medium/high (or unscored) → an exception.
       return score?.riskBucket === "low" ? "fast_close" : "exceptions"
     case "info_requested":
       return "re_eval"
@@ -66,7 +58,7 @@ export function tierFor(dossier: DossierSummary): QueueTier {
   }
 }
 
-/** Group dossiers by tier, ordered by priority, with empty tiers omitted. */
+// Empty tiers are omitted.
 export function groupQueue(dossiers: DossierSummary[]): QueueGroup[] {
   const buckets = new Map<QueueTier, DossierSummary[]>()
 
@@ -87,20 +79,8 @@ export function groupQueue(dossiers: DossierSummary[]): QueueGroup[] {
   })
 }
 
-/**
- * Map a dossier's status + risk to a StatusBadge key + visible label.
- *
- * - pending_review + low      → clean "Propre"
- * - pending_review + medium   → anomaly_notable "Risque modéré"
- * - pending_review + high     → anomaly_blocking "Risque élevé"
- * - pending_review + no score → incomplete_action (needs data before review)
- * - awaiting_client           → incomplete_waiting
- * - info_requested            → pending
- * - blocked                   → anomaly_blocking "Bloqué"
- * - approved                  → clean "Validé"
- * - rejected                  → decided "Refusé" (neutral — a closed decision,
- *                               not something that needs attention; §5 signal economy)
- */
+// rejected uses the neutral `decided` key, not amber: a closed decision is not
+// something that needs attention (§5 signal economy).
 export function badgeFor(dossier: DossierSummary): {
   status: StatusKey
   label: string

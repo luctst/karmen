@@ -1,9 +1,4 @@
-/**
- * Tiny typed fetch wrapper around the Karmen API. Reads the API origin from
- * VITE_API_BASE_URL (inlined at build time), falling back to localhost:3000.
- * Throws a useful Error on any non-2xx response.
- */
-
+// VITE_API_BASE_URL is inlined at build time.
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000"
 

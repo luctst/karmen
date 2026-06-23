@@ -4,16 +4,9 @@ import { ChevronRight } from "lucide-react"
 import { StatusBadge } from "@karmen/ui/components/status-badge"
 import { cn } from "@karmen/ui/lib/utils"
 
-import type { DossierSummary } from "../api/types"
-import { badgeFor } from "../screens/queue/grouping"
-import { scoreDisplay } from "../screens/queue/score"
-
-/**
- * QueueRow — one dossier in the triage list. The whole row is a single link
- * (keyboard accessible, focus-visible ring, Enter opens). Layout, left to
- * right: dominant StatusBadge · company name (truncate + title tooltip) ·
- * score + category (mono tabular) · business type meta · open affordance.
- */
+import type { DossierSummary } from "../../api/types"
+import { badgeFor } from "./grouping"
+import { scoreDisplay } from "./score"
 
 type QueueRowProps = {
   dossier: DossierSummary

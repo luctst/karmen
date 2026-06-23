@@ -4,14 +4,13 @@ import userEvent from "@testing-library/user-event"
 import { MemoryRouter } from "react-router-dom"
 
 import { Queue } from "./Queue"
-import { makeDossier, makeScore } from "../test/fixtures"
-import type { DossierSummary } from "../api/types"
+import { makeDossier, makeScore } from "../../test/fixtures"
+import type { DossierSummary } from "../../api/types"
 
-// Mock the data hook rather than fetch: the Queue contract is "given this async
-// state, render that surface". Mocking the hook keeps the test about the
-// loading/empty/error/success switch, not about transport details.
+// Mock the hook, not fetch: the test is about the loading/empty/error/success
+// switch given an async state, not about transport.
 const useQueueMock = vi.fn()
-vi.mock("../api/hooks", () => ({
+vi.mock("../../api/hooks", () => ({
   useQueue: () => useQueueMock(),
 }))
 

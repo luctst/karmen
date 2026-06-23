@@ -5,12 +5,7 @@ import type {
   RiskBucket,
 } from "../api/types"
 
-/**
- * Test fixtures for queue dossiers. `makeDossier` builds a valid summary with
- * sensible defaults; override only the fields a test cares about so the intent
- * of each case stays obvious.
- */
-
+// makeDossier builds a valid summary; override only the fields a test cares about.
 let seq = 0
 
 export function makeScore(

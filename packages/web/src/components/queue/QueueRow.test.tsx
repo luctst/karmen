@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 
 import { QueueRow } from "./QueueRow"
-import { makeDossier, makeScore } from "../test/fixtures"
+import { makeDossier, makeScore } from "../../test/fixtures"
 
 function renderRow(dossier = makeDossier()) {
   return render(
@@ -27,9 +27,8 @@ describe("QueueRow", () => {
 
   it('renders "NN / X" for a scored dossier', () => {
     renderRow(makeDossier({ score: makeScore(82, "low") }))
-    // Visible value/category (aria-hidden), shown to sighted users.
     expect(screen.getByText(/82 \/ A/)).toBeInTheDocument()
-    // Screen readers get the score as a full sentence, not "82 slash A".
+    // Screen readers get a full sentence, not "82 slash A".
     expect(
       screen.getByText("Score 82 sur 100, catégorie A, Risque faible")
     ).toBeInTheDocument()

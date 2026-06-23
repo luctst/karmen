@@ -1,9 +1,8 @@
 import { defineConfig } from "vitest/config"
 import react from "@vitejs/plugin-react"
 
-// Vitest config kept separate from vite.config.ts so the app build does not
-// pull in the test-only jsdom/globals setup. The react plugin transforms both
-// web sources and the @karmen/ui .tsx components imported across the workspace.
+// Separate from vite.config.ts so the app build stays free of the jsdom/globals
+// test setup. react() also transforms the @karmen/ui .tsx imported cross-workspace.
 export default defineConfig({
   plugins: [react()],
   test: {

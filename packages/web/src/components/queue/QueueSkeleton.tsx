@@ -1,9 +1,4 @@
-/**
- * QueueSkeleton — loading placeholder that preserves the list layout (no
- * spinner-on-blank). A single skeleton group header + several row-height
- * pulses (~44px). aria-busy announces the in-flight load.
- */
-
+// Preserves the list layout while loading (no spinner-on-blank).
 const ROW_COUNT = 7
 
 export function QueueSkeleton() {

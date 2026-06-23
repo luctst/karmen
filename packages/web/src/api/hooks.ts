@@ -9,12 +9,8 @@ type AsyncState<T> = {
   error: Error | null
 }
 
-/**
- * Read-only fetch of the queue. No react-query this step — there are no
- * mutations yet; we introduce it when writes (Valider, override) arrive.
- * Aborts the in-flight request on unmount / refetch to avoid setState on an
- * unmounted component.
- */
+// No react-query yet — no mutations to justify it; add it when writes (Valider,
+// override) arrive. Aborts in-flight requests on unmount/refetch.
 export function useQueue() {
   const [state, setState] = useState<AsyncState<DossierSummary[]>>({
     data: null,
@@ -52,7 +48,6 @@ export function useQueue() {
   return { ...state, refetch }
 }
 
-/** Single dossier detail for the Workspace stub. */
 export function useDossier(id: string | undefined) {
   const [state, setState] = useState<AsyncState<DossierDetail>>({
     data: null,

@@ -2,11 +2,6 @@ import { AlertTriangle } from "lucide-react"
 
 import { Button } from "@karmen/ui/components/button"
 
-/**
- * ErrorBanner — inline, non-blocking load-failure notice with a retry.
- * Uses the status-block tokens (color-is-never-alone: icon + text + color).
- */
-
 type ErrorBannerProps = {
   message: string
   onRetry: () => void

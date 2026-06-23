@@ -1,12 +1,6 @@
 import type { ComponentType, ReactNode } from "react"
 import type { LucideProps } from "lucide-react"
 
-/**
- * EmptyState — a warm, professional zero state (DESIGN.md `EmptyState`).
- * One line of context + an optional primary action. Never "No items found";
- * a nothing-to-do state is dignified (P1).
- */
-
 type EmptyStateProps = {
   icon: ComponentType<LucideProps>
   title: string

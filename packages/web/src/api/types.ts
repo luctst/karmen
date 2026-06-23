@@ -1,8 +1,4 @@
-/**
- * Hand-kept mirror of the Karmen API DTOs. This is the contract the web app
- * codes against; keep it in sync with the API by inspection (no codegen yet).
- */
-
+// Hand-kept mirror of the API DTOs — keep in sync by inspection (no codegen yet).
 export type DossierStatus =
   | "pending_review"
   | "info_requested"
@@ -27,7 +23,7 @@ export type DossierScore = {
   globalScore: number
 }
 
-/** Shape of one item from `GET /dossiers`. */
+// GET /dossiers
 export type DossierSummary = {
   id: string
   company: Company
@@ -38,7 +34,7 @@ export type DossierSummary = {
   score: DossierScore | null
 }
 
-/** Subset of `GET /dossiers/:id` the Workspace stub consumes. */
+// GET /dossiers/:id (subset the Workspace stub consumes)
 export type DossierDetail = {
   company: Company
   financingRequest: {

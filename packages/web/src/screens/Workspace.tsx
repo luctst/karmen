@@ -3,12 +3,7 @@ import { ArrowLeft } from "lucide-react"
 
 import { useDossier } from "../api/hooks"
 
-/**
- * Workspace (Screen 2) — STUB ONLY. Just enough to prove row navigation
- * works: it reads :id, fetches the dossier detail, and shows company name +
- * SIREN + a back link. The real shell (sidebar, sections, Valider) is the
- * next step. Loading / error handled minimally.
- */
+// STUB: proves row navigation only. Real shell (sidebar, sections, Valider) next.
 export function Workspace() {
   const { id } = useParams<{ id: string }>()
   const { data, isLoading, error } = useDossier(id)

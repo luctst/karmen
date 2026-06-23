@@ -1,18 +1,13 @@
 import { CheckCircle2 } from "lucide-react"
 
-import { useQueue } from "../api/hooks"
-import type { DossierSummary } from "../api/types"
-import { EmptyState } from "../components/EmptyState"
-import { ErrorBanner } from "../components/ErrorBanner"
-import { QueueRow } from "../components/QueueRow"
-import { QueueSkeleton } from "../components/QueueSkeleton"
-import { groupQueue } from "./queue/grouping"
+import { useQueue } from "../../api/hooks"
+import type { DossierSummary } from "../../api/types"
+import { EmptyState } from "../../components/EmptyState"
+import { ErrorBanner } from "../../components/ErrorBanner"
+import { QueueRow } from "../../components/queue/QueueRow"
+import { QueueSkeleton } from "../../components/queue/QueueSkeleton"
+import { groupQueue } from "../../components/queue/grouping"
 
-/**
- * Queue (Screen 1) — the triage surface. Container owns the data fetch and
- * the loading / empty / error / success switch; presentation lives in the
- * small components below and in QueueRow.
- */
 export function Queue() {
   const { data, isLoading, error, refetch } = useQueue()
 
