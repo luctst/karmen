@@ -34,6 +34,42 @@ enum RiskBucket {
   high
 }
 
+enum GateStatus {
+  complet
+  action_requise
+  attente_client
+}
+
+enum SourceKind {
+  bank
+  fiscal
+}
+
+enum SourceState {
+  connected
+  pending
+  failed
+  fallback
+}
+
+enum Confidence {
+  high
+  medium
+  low
+}
+
+enum FactorDirection {
+  up
+  down
+}
+
+enum IndicatorStatus {
+  conforme
+  notable
+  blocking
+  info
+}
+
 model Company {
   id            String    @id
   name          String
@@ -66,8 +102,12 @@ model FinancingRequest {
   durationInMonth Int
   interestRate    Float?
 
-  documents Document[]
-  score     Score?
+  documents         Document[]
+  score             Score?
+  completeness      Completeness?
+  connectionSources ConnectionSource[]
+  hiddenAccounts    HiddenAccount[]
+  analyse           Analyse?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -92,7 +132,85 @@ model Score {
   financingRequest   FinancingRequest @relation(fields: [financingRequestId], references: [id], onDelete: Cascade)
   riskBucket         RiskBucket
   globalScore        Int
+  confidence         Confidence
+  confidenceReason   String?
+  calibrationNote    String?
+
+  factors    ScoreFactor[]
+  checkItems CheckItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Completeness {
+  id                 String           @id @default(cuid())
+  financingRequestId String           @unique
+  financingRequest   FinancingRequest @relation(fields: [financingRequestId], references: [id], onDelete: Cascade)
+  gateStatus         GateStatus
+  lastReminderAt     DateTime?
+}
+
+model ConnectionSource {
+  id                 String           @id @default(cuid())
+  financingRequestId String
+  financingRequest   FinancingRequest @relation(fields: [financingRequestId], references: [id], onDelete: Cascade)
+  kind               SourceKind
+  state              SourceState
+  label              String
+  detail             String?
+}
+
+model HiddenAccount {
+  id                 String           @id @default(cuid())
+  financingRequestId String
+  financingRequest   FinancingRequest @relation(fields: [financingRequestId], references: [id], onDelete: Cascade)
+  ibanMasked         String
+  pattern            String
+}
+
+model ScoreFactor {
+  id        String          @id @default(cuid())
+  scoreId   String
+  score     Score           @relation(fields: [scoreId], references: [id], onDelete: Cascade)
+  label     String
+  direction FactorDirection
+  weight    Int
+}
+
+model CheckItem {
+  id      String @id @default(cuid())
+  scoreId String
+  score   Score  @relation(fields: [scoreId], references: [id], onDelete: Cascade)
+  label   String
+}
+
+model Analyse {
+  id                 String           @id @default(cuid())
+  financingRequestId String           @unique
+  financingRequest   FinancingRequest @relation(fields: [financingRequestId], references: [id], onDelete: Cascade)
+  preAssessment      String
+
+  indicators Indicator[]
+}
+
+model Indicator {
+  id            String          @id @default(cuid())
+  analyseId     String
+  analyse       Analyse         @relation(fields: [analyseId], references: [id], onDelete: Cascade)
+  label         String
+  category      String?
+  value         String
+  threshold     String?
+  status        IndicatorStatus
+  evidenceLabel String?
+
+  mitigants Mitigant[]
+}
+
+model Mitigant {
+  id          String    @id @default(cuid())
+  indicatorId String
+  indicator   Indicator @relation(fields: [indicatorId], references: [id], onDelete: Cascade)
+  text        String
 }
